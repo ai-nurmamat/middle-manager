@@ -1,5 +1,5 @@
 import datetime
-from chronos_graph import UniversalHypergraph, FourDTuple
+from .graph import UniversalHypergraph, FourDTuple
 
 # ===================================================================
 # 认知巩固机制 (Cognitive Consolidation / "Sleep" Mechanism)

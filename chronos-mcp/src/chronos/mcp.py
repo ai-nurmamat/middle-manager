@@ -1,8 +1,8 @@
 import json
 import datetime
-from chronos_graph import UniversalHypergraph
-from chronos_llm import MockExtractor
-from chronos_sleep import SleepConsolidator
+from .graph import UniversalHypergraph
+from .llm import MockExtractor, UniversalExtractor
+from .sleep import SleepConsolidator
 
 # ===================================================================
 # Chronos-V2 MCP Gateway (时空网关)

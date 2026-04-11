@@ -3,7 +3,7 @@ import json
 import datetime
 from typing import List
 from openai import OpenAI
-from chronos_graph import UniversalHypergraph, FourDTuple, SourceEvidence
+from .graph import UniversalHypergraph, FourDTuple, SourceEvidence
 
 # ===================================================================
 # 万能结构化提取器 (Universal Extractor)
