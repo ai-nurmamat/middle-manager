@@ -1,0 +1,41 @@
+{
+  "name": "chronos-mcp",
+  "version": "0.1.0",
+  "description": "A Disruptive Universal 4D Hypergraph (S-P-O-T) memory engine for LLMs.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example": "ts-node examples/demo.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/chronos-mcp.git"
+  },
+  "keywords": [
+    "llm",
+    "memory",
+    "knowledge-graph",
+    "mcp",
+    "rag",
+    "temporal-graph"
+  ],
+  "author": "Chronos Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/chronos-mcp/issues"
+  },
+  "homepage": "https://github.com/yourusername/chronos-mcp#readme",
+  "dependencies": {
+    "openai": "^4.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  }
+}

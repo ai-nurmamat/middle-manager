@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chronos-mcp"
+version = "0.1.0"
+description = "A Disruptive Universal 4D Hypergraph (S-P-O-T) memory engine for LLMs."
+readme = "README.md"
+authors = [
+    { name = "Chronos Team", email = "hello@chronos-mcp.org" }
+]
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = ["llm", "memory", "knowledge-graph", "mcp", "rag", "temporal-graph"]
+dependencies = [
+    "pydantic>=2.0.0",
+    "openai>=1.0.0"
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/chronos-mcp"
+Issues = "https://github.com/yourusername/chronos-mcp/issues"
