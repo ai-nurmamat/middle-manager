@@ -10,5 +10,5 @@ __all__ = [
     "UniversalExtractor",
     "MockExtractor",
     "SleepConsolidator",
-    "MCPGateway"
+    "MCPGateway",
 ]

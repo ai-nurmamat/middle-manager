@@ -1,63 +1,128 @@
+"""
+Core Data Structures for the Chronos-MCP Engine.
+
+This module defines the foundational models for the Universal 4D Hypergraph.
+Every piece of information is treated as a 4D Tuple: (Subject, Predicate, Object, Time).
+"""
+
 import uuid
-from typing import Dict, List, Optional, Any, Set
-from pydantic import BaseModel, Field
 import datetime
-from collections import defaultdict
+from typing import Dict, List, Optional, Set
+from pydantic import BaseModel, Field
+
 
 class SourceEvidence(BaseModel):
-    """溯源证据，保证数据来源可追溯"""
-    source_id: str
-    text_snippet: str
-    timestamp: datetime.datetime
+    """
+    Evidence to trace back the origin of a data point, eliminating AI hallucinations.
+    """
+
+    source_id: str = Field(
+        ..., description="Unique identifier of the source document/report."
+    )
+    text_snippet: str = Field(
+        ..., description="The original text snippet from which the data was extracted."
+    )
+    timestamp: datetime.datetime = Field(
+        ..., description="The publication or occurrence time of the source."
+    )
+
 
 class FourDTuple(BaseModel):
     """
-    万物皆 Tuple: S-P-O-T
+    The Universal 4D Tuple: S-P-O-T
     (Subject, Predicate, Object, Time)
-    彻底颠覆传统图谱和传统时序数据库的隔离，用一种结构表达一切。
+
+    This disruptive model breaks the boundaries between traditional property graphs
+    and time-series databases by representing everything as a temporal edge.
     """
+
     id: str = Field(default_factory=lambda: f"tup_{uuid.uuid4().hex[:8]}")
-    subject: str = Field(..., description="主体，如 '宁德时代'")
-    predicate: str = Field(..., description="谓语，如 '毛利率', '投资', '发布'")
-    object: str = Field(..., description="客体，如 '28.5%', '固态电池', '海豹'")
-    time: datetime.datetime = Field(..., description="事件/状态发生的时间")
-    
-    # 元数据
-    unit: Optional[str] = Field(None, description="当 object 是数值时的单位")
-    evidence: Optional[SourceEvidence] = None
+    subject: str = Field(..., description="The subject entity, e.g., 'CATL', 'Apple'.")
+    predicate: str = Field(
+        ..., description="The relation or property, e.g., 'gross margin', 'invests_in'."
+    )
+    object: str = Field(
+        ...,
+        description="The object entity or value, e.g., '28.5', 'Solid State Battery'.",
+    )
+    time: datetime.datetime = Field(
+        ..., description="The exact time when this fact is valid or occurred."
+    )
+
+    # Metadata
+    unit: Optional[str] = Field(
+        None, description="The unit if the object is a numeric value, e.g., '%', 'USD'."
+    )
+    evidence: Optional[SourceEvidence] = Field(
+        None, description="Source evidence to guarantee traceability."
+    )
+
 
 class UniversalHypergraph:
     """
-    万能的四维超图记忆引擎 (纯内存实现，随时可换为 Postgres+Timescale)
+    Universal 4D Hypergraph Memory Engine.
+
+    A pure in-memory O(1) indexing engine that natively supports Temporal Knowledge Graphs.
+    It indexes tuples by Subject, Predicate, and Object to allow instant multidimensional queries.
     """
-    def __init__(self):
+
+    def __init__(self) -> None:
         self.tuples: Dict[str, FourDTuple] = {}
-        
-        # 索引，O(1) 访问
-        self._s_index: Dict[str, List[str]] = defaultdict(list)
-        self._p_index: Dict[str, List[str]] = defaultdict(list)
-        self._o_index: Dict[str, List[str]] = defaultdict(list)
+
+        # O(1) Inverted Indexes
+        self._s_index: Dict[str, List[str]] = {}
+        self._p_index: Dict[str, List[str]] = {}
+        self._o_index: Dict[str, List[str]] = {}
 
     def insert(self, tup: FourDTuple) -> str:
-        """写入 Tuple 并建立索引"""
+        """
+        Insert a FourDTuple into the hypergraph and update indexes.
+
+        Args:
+            tup (FourDTuple): The tuple to insert.
+
+        Returns:
+            str: The unique ID of the inserted tuple.
+        """
         self.tuples[tup.id] = tup
+
+        if tup.subject not in self._s_index:
+            self._s_index[tup.subject] = []
         self._s_index[tup.subject].append(tup.id)
+
+        if tup.predicate not in self._p_index:
+            self._p_index[tup.predicate] = []
         self._p_index[tup.predicate].append(tup.id)
+
+        if tup.object not in self._o_index:
+            self._o_index[tup.object] = []
         self._o_index[tup.object].append(tup.id)
+
         return tup.id
 
-    def query(self, 
-              subject: Optional[str] = None, 
-              predicate: Optional[str] = None, 
-              object: Optional[str] = None,
-              start_time: Optional[datetime.datetime] = None,
-              end_time: Optional[datetime.datetime] = None) -> List[FourDTuple]:
+    def query(
+        self,
+        subject: Optional[str] = None,
+        predicate: Optional[str] = None,
+        object: Optional[str] = None,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+    ) -> List[FourDTuple]:
         """
-        全维图谱查询。可以按主、谓、宾任意组合查询，并按时间过滤。
+        Query the Universal Hypergraph across any combination of dimensions.
+
+        Args:
+            subject (Optional[str]): Filter by subject entity.
+            predicate (Optional[str]): Filter by predicate/relation.
+            object (Optional[str]): Filter by object entity or value.
+            start_time (Optional[datetime.datetime]): Filter tuples occurring on or after this time.
+            end_time (Optional[datetime.datetime]): Filter tuples occurring on or before this time.
+
+        Returns:
+            List[FourDTuple]: A chronologically sorted list of matching tuples.
         """
-        # 取交集
         candidates: Optional[Set[str]] = None
-        
+
         if subject:
             s_set = set(self._s_index.get(subject, []))
             candidates = s_set if candidates is None else candidates.intersection(s_set)
@@ -67,17 +132,19 @@ class UniversalHypergraph:
         if object:
             o_set = set(self._o_index.get(object, []))
             candidates = o_set if candidates is None else candidates.intersection(o_set)
-            
+
         if candidates is None:
             candidates = set(self.tuples.keys())
-            
+
         results = []
         for cid in candidates:
             t = self.tuples[cid]
-            if start_time and t.time < start_time: continue
-            if end_time and t.time > end_time: continue
+            if start_time and t.time < start_time:
+                continue
+            if end_time and t.time > end_time:
+                continue
             results.append(t)
-            
-        # 强制按时间排序
+
+        # Always return chronologically sorted data
         results.sort(key=lambda x: x.time)
         return results
